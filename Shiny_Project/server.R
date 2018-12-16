@@ -21,41 +21,171 @@ accidentés <- subset(data, data$ACCIDENT == 1)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
    
-  output$experiencePlot <- renderPlot({
+  # 1.1 - Les humeurs
+  #Neutre
+  output$humeurNeutrePlot <- renderPLot({
+    AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
+                           !is.na(HUMEURNEUTRE) |
+                             !is.na(HUMEURGAI) |
+                             !is.na(HUMEURMECONTENT)|
+                             !is.na(HUMEURTRISTE) |
+                             !is.na(HUMEURCOLERE) 
+    )
     
-    #On retire la personne qui a une expérience peut plosible
-    accidentés <- subset(data, data$EXPCYCLO < 98)
+    AccAndHumeur <- subset(AccAndHumeur, AccAndHumeur$HUMEURCOLERE <= 5 & AccAndHumeur$HUMEURGAI <= 5 & AccAndHumeur$HUMEURMECONTENT <= 5 & AccAndHumeur$HUMEURTRISTE <= 5 & AccAndHumeur$HUMEURCOLERE <= 5)
     
+    # On tris les id par type d'accident:
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(71:75), "ACC"] <- 15
     
-    # On créé une valeur de l'expérience totale pour chaque accidenté
-    accidentés$expCalc =(accidentés$EXPCYCLO + accidentés$EXP125 + accidentés$EXPSUP125)/3
+    contingenceAccNeutre <- table(AccAndHumeur$ACC, AccAndHumeur$HUMEURNEUTRE)
+    colnames(contingenceAccNeutre) <- c("Neutre_Ext","Neutre_Pro", "Neutre_Perso", "Neutre_Non", "Neutre_NSP")
+    afcNeutre <- CA(contingenceAccNeutre)
+  })
+  
+  output$humeurGaiPlot <- renderPLot({
+    AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
+                           !is.na(HUMEURNEUTRE) |
+                             !is.na(HUMEURGAI) |
+                             !is.na(HUMEURMECONTENT)|
+                             !is.na(HUMEURTRISTE) |
+                             !is.na(HUMEURCOLERE) 
+    )
     
-    #On a le nombre d'accident et l'experience pour chaque individu de façon nettoyée
-    accidentésNettoyé <- select(accidentés, "NBACC1", "NBACC2", "NBACC3", "NBACC4", "NBACC5", "NBACC6", "NBACC7", "NBACC8", "NBACC9", "NBACC10", "NBACC11", "NBACC12", "NBACC13", "NBACC14", "expCalc" )
-
-    # Mise en place des données en deux dimensions pour le plot
-    expAndAccCategorie <- data.frame(typeAccident = as.factor(numeric()), experience = numeric())
-    levels(expAndAccCategorie$typeAccident) <- c(1:14)
+    AccAndHumeur <- subset(AccAndHumeur, AccAndHumeur$HUMEURCOLERE <= 5 & AccAndHumeur$HUMEURGAI <= 5 & AccAndHumeur$HUMEURMECONTENT <= 5 & AccAndHumeur$HUMEURTRISTE <= 5 & AccAndHumeur$HUMEURCOLERE <= 5)
     
-    for(i in 1:nrow(accidentésNettoyé)) {
-      for(j in 1:14){
-        if(accidentésNettoyé[i,j] > 0) {
-          for(k in 1:accidentésNettoyé[i,j]) {
-            #colonne 14 pour avoir l'experience des accidents
-            value <- data.frame(typeAccident = as.factor(j), experience = accidentésNettoyé[i,15])
-            expAndAccCategorie <- rbind(expAndAccCategorie, value)
-          }
-        }
-      }
-    }
+    # On tris les id par type d'accident:
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(71:75), "ACC"] <- 15
     
-    # draw the histogram with the specified number of bins
-    #Plot dynamique pour shiny:
-    if(!is.null(input$typeAccident)){
-      ggplot(data = filter(.data = expAndAccCategorie, typeAccident == input$typeAccident), mapping = aes(x=experience, , fill=typeAccident , alpha=0.2)) + 
-      geom_density() + 
-      labs(title="", x="Experience")
-    }
+    contingenceAccGai <- table(AccAndHumeur$ACC, AccAndHumeur$HUMEURGAI)# AccAndHumeur$HUMEURGAI, AccAndHumeur$HUMEURMECONTENT, AccAndHumeur$HUMEURTRISTE, AccAndHumeur$HUMEURCOLERE)
+    colnames(contingenceAccGai) <- c("Gai_Ext","Gai_Pro", "Gai_Perso", "Gai_Non", "Gai_NSP")
+    afcGai <- CA(contingenceAccGai)
+  })
+  
+  output$humeurTristePlot <- renderPLot({
+    AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
+                           !is.na(HUMEURNEUTRE) |
+                             !is.na(HUMEURGAI) |
+                             !is.na(HUMEURMECONTENT)|
+                             !is.na(HUMEURTRISTE) |
+                             !is.na(HUMEURCOLERE) 
+    )
+    
+    AccAndHumeur <- subset(AccAndHumeur, AccAndHumeur$HUMEURCOLERE <= 5 & AccAndHumeur$HUMEURGAI <= 5 & AccAndHumeur$HUMEURMECONTENT <= 5 & AccAndHumeur$HUMEURTRISTE <= 5 & AccAndHumeur$HUMEURCOLERE <= 5)
+    
+    # On tris les id par type d'accident:
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(71:75), "ACC"] <- 15
+    
+    contingenceAccTriste <- table(AccAndHumeur$ACC, AccAndHumeur$HUMEURTRISTE)# AccAndHumeur$HUMEURTRISTE, AccAndHumeur$HUMEURMECONTENT, AccAndHumeur$HUMEURTRISTE, AccAndHumeur$HUMEURCOLERE)
+    colnames(contingenceAccTriste) <- c("Triste_Ext","Triste_Pro", "Triste_Perso", "Triste_Non", "Triste_NSP")
+    afcTriste <- CA(contingenceAccTriste)
+  })
+  
+  output$humeurContentPlot <- renderPLot({
+    AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
+                           !is.na(HUMEURNEUTRE) |
+                             !is.na(HUMEURGAI) |
+                             !is.na(HUMEURMECONTENT)|
+                             !is.na(HUMEURTRISTE) |
+                             !is.na(HUMEURCOLERE) 
+    )
+    
+    AccAndHumeur <- subset(AccAndHumeur, AccAndHumeur$HUMEURCOLERE <= 5 & AccAndHumeur$HUMEURGAI <= 5 & AccAndHumeur$HUMEURMECONTENT <= 5 & AccAndHumeur$HUMEURTRISTE <= 5 & AccAndHumeur$HUMEURCOLERE <= 5)
+    
+    # On tris les id par type d'accident:
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(71:75), "ACC"] <- 15
+    
+    contingenceAccContent <- table(AccAndHumeur$ACC, AccAndHumeur$HUMEURMECONTENT)# AccAndHumeur$HUMEURGAI, AccAndHumeur$HUMEURMECONTENT, AccAndHumeur$HUMEURTRISTE, AccAndHumeur$HUMEURCOLERE)
+    colnames(contingenceAccContent) <- c("Mecontent_Ext","Mecontent_Pro", "Mecontent_Perso", "Mecontent_Non", "Mecontent_NSP")
+    afcMecontent <- CA(contingenceAccContent)
+  })
+  
+  output$humeurColerePlot <- renderPLot({
+    AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
+                           !is.na(HUMEURNEUTRE) |
+                             !is.na(HUMEURGAI) |
+                             !is.na(HUMEURMECONTENT)|
+                             !is.na(HUMEURTRISTE) |
+                             !is.na(HUMEURCOLERE) 
+    )
+    
+    AccAndHumeur <- subset(AccAndHumeur, AccAndHumeur$HUMEURCOLERE <= 5 & AccAndHumeur$HUMEURGAI <= 5 & AccAndHumeur$HUMEURMECONTENT <= 5 & AccAndHumeur$HUMEURTRISTE <= 5 & AccAndHumeur$HUMEURCOLERE <= 5)
+    
+    # On tris les id par type d'accident:
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    AccAndHumeur[AccAndHumeur$CHOIXACC %in% c(71:75), "ACC"] <- 15
+    
+    contingenceAccColere <- table(AccAndHumeur$ACC, AccAndHumeur$HUMEURCOLERE)# AccAndHumeur$HUMEURGAI, AccAndHumeur$HUMEURMECONTENT, AccAndHumeur$HUMEURTRISTE, AccAndHumeur$HUMEURCOLERE)
+    colnames(contingenceAccColere) <- c("Colere_Ext","Colere_Pro", "Colere_Perso", "Colere_Non", "Colere_NSP")
+    afcColere <- CA(contingenceAccColere)
   })
   
   # 1.2 - Les infrastructures
@@ -105,6 +235,7 @@ shinyServer(function(input, output) {
     }
   })
   
+  # 1.3
   output$presenceTiersPlot <- renderPlot({
     #On récupère les personnes ayant eu des accidents
     accidentés <- subset(data, data$ACCIDENT == 1)
@@ -158,6 +289,7 @@ shinyServer(function(input, output) {
     })
   })
   
+  # 2.1
   output$representationJeunesPlot <- renderPlot({
     
     dateNaissance <- as.Date(data$DATE_NAISS, format="%d%b%Y")
@@ -249,9 +381,46 @@ shinyServer(function(input, output) {
       geom_bar(stat="identity", fill = "#004d7e") + 
       geom_hline(aes(yintercept = finalProportionAllType["vingtaine"]), color="#64be29", linetype="dashed") + 
       theme_light()
-    })
+    }
   })
   
+  # 2.2
+  output$experiencePlot <- renderPlot({
+    
+    #On retire la personne qui a une expérience peut plosible
+    accidentés <- subset(data, data$EXPCYCLO < 98)
+    
+    
+    # On créé une valeur de l'expérience totale pour chaque accidenté
+    accidentés$expCalc =(accidentés$EXPCYCLO + accidentés$EXP125 + accidentés$EXPSUP125)/3
+    
+    #On a le nombre d'accident et l'experience pour chaque individu de façon nettoyée
+    accidentésNettoyé <- select(accidentés, "NBACC1", "NBACC2", "NBACC3", "NBACC4", "NBACC5", "NBACC6", "NBACC7", "NBACC8", "NBACC9", "NBACC10", "NBACC11", "NBACC12", "NBACC13", "NBACC14", "expCalc" )
+    
+    # Mise en place des données en deux dimensions pour le plot
+    expAndAccCategorie <- data.frame(typeAccident = as.factor(numeric()), experience = numeric())
+    levels(expAndAccCategorie$typeAccident) <- c(1:14)
+    
+    for(i in 1:nrow(accidentésNettoyé)) {
+      for(j in 1:14){
+        if(accidentésNettoyé[i,j] > 0) {
+          for(k in 1:accidentésNettoyé[i,j]) {
+            #colonne 14 pour avoir l'experience des accidents
+            value <- data.frame(typeAccident = as.factor(j), experience = accidentésNettoyé[i,15])
+            expAndAccCategorie <- rbind(expAndAccCategorie, value)
+          }
+        }
+      }
+    }
+    
+    # draw the histogram with the specified number of bins
+    #Plot dynamique pour shiny:
+    if(!is.null(input$typeAccident)){
+      ggplot(data = filter(.data = expAndAccCategorie, typeAccident == input$typeAccident), mapping = aes(x=experience, , fill=typeAccident , alpha=0.2)) + 
+        geom_density() + 
+        labs(title="", x="Experience")
+    }
+  })
   
-  
+  outpu$
 })
