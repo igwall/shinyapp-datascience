@@ -58,4 +58,56 @@ shinyServer(function(input, output) {
     }
   })
   
+  
+  
+  # 1.2 - Les infrastructures
+  output$infrastructurePlot <- renderPlot({
+    #On récupère les personnes ayant eu des accidents
+    accidentés <- subset(data, data$ACCIDENT == 1)
+    
+    accidentésInfrastructure <- select(accidentés, "CHOIXACC", "ROLEINFRA")
+    
+    # On enlève les accidents avec des données vides:
+    accidentésInfrastructureApprofondi <- subset(accidentésInfrastructure, !is.na(ROLEINFRA))
+    str(accidentésInfrastructureApprofondi$ROLEINFRA)
+    
+    levels(accidentésInfrastructureApprofondi$ROLEINFRA) <- c(1,2)
+    levels(accidentésInfrastructureApprofondi$ACC) <- c(1:15)
+    accidentésInfrastructureApprofondi$NIQUE <- 1
+    
+    # On tris les id par type d'accident:
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(71:75), "ACC"] <- 15
+    
+    contingenceInfrastructure <- table(accidentésInfrastructureApprofondi$ACC, accidentésInfrastructureApprofondi$ROLEINFRA)
+    df_contingence <- as.data.frame.matrix(contingenceInfrastructure)
+    colnames(df_contingence) <- c("Oui","Non")
+    
+    chisq.test(contingenceInfrastructure)
+    
+    contingence_oui <- data.frame(type_acc = c(1:15), nb = df_contingence$Oui, RoleInfrastructure = "Oui")
+    contingence_non <- data.frame(type_acc = c(1:15), nb = df_contingence$Non, RoleInfrastructure = "Non")
+    contingence_final <- rbind(contingence_oui, contingence_non) 
+    
+    if(!is.null(input$typeAccident)){
+    ggplot(data= filter(.data = contingence_final, ACC == input$typeAccident), aes(x=type_acc, y=nb)) + 
+      geom_bar(stat= "identity", aes(fill = RoleInfrastructure)) + 
+      scale_fill_manual(values=c("#004d7e", "#64be29")) + 
+      labs(title="Role de l'infrastructure pour chaque type d'accident", x="Type d'accident", y="Nombre de réponse")
+    }
+  })
+  
 })
