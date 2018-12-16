@@ -56,6 +56,7 @@ shinyServer(function(input, output) {
     afcNeutre <- CA(contingenceAccNeutre)
   })
   
+  #Gai
   output$humeurGaiPlot <- renderPLot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
@@ -89,6 +90,7 @@ shinyServer(function(input, output) {
     afcGai <- CA(contingenceAccGai)
   })
   
+  #Triste
   output$humeurTristePlot <- renderPLot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
@@ -122,6 +124,7 @@ shinyServer(function(input, output) {
     afcTriste <- CA(contingenceAccTriste)
   })
   
+  #Content
   output$humeurContentPlot <- renderPLot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
@@ -155,6 +158,7 @@ shinyServer(function(input, output) {
     afcMecontent <- CA(contingenceAccContent)
   })
   
+  #Colere
   output$humeurColerePlot <- renderPLot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
@@ -422,5 +426,5 @@ shinyServer(function(input, output) {
     }
   })
   
-  outpu$
+  
 })
