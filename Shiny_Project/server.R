@@ -192,6 +192,127 @@ shinyServer(function(input, output) {
     afcColere <- CA(contingenceAccColere)
   })
   
+  #Usages AFC
+  output$usagePlot <- renderPlot({
+    accidentPropre <- select(subset(data, data$ACCIDENT == 1), "NBACC1", "NBACC2","NBACC3","NBACC4","NBACC5","NBACC6","NBACC7","NBACC8", "NBACC9","NBACC10","NBACC11","NBACC12","NBACC13","NBACC14","USAGE1")
+    
+    # Mise en place des données en deux dimensions pour le plot
+    AccAndUsage <- data.frame(typeAccident = factor(integer()), usage= factor(integer()))
+    
+    levels(AccAndUsage$typeAccident) <- c(1:14)
+    levels(AccAndUsage$usage) <- c(1:3)
+    
+    for(i in 1:nrow(accidentPropre)) {
+      for(j in 1:14){
+        if(accidentPropre[i,j] > 0) {
+          for(k in 1:accidentPropre[i,j]) {
+            #colonne 14 pour avoir l'experience des accidents
+            value <- data.frame(typeAccident = as.factor(j), usage = accidentPropre[i,"USAGE1"])
+            AccAndUsage <- rbind(AccAndUsage, value)
+          }
+        }
+      }
+    }
+    
+    tab <- table(AccAndUsage$typeAccident, AccAndUsage$usage)
+    chisq.test(tab)
+    AFCusage <- CA(tab)
+    
+  })
+  
+  #1.1 Alccol
+  
+  output$alcoolPlot <- renderPlot({
+    accidentés <- subset(data, data$ACCIDENT == 1)
+    
+    # Pour savoir si un accident est aggravé on s'interesse au questionnaire approfondi. 
+    # Pour savoir de quel accident il parle, on doit récupérer l'id de l'accident afin de le relier
+    # à l'accident en question.
+    
+    # On sélectionne les bonnes colonnes et on enlève les accidents avec des données vides:
+    AccAndAlcool <- subset(select(accidentés, "CHOIXACC", "ALCOOL"), !is.na(ALCOOL))
+    
+    # On tris les id par type d'accident:
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    AccAndAlcool[AccAndAlcool$CHOIXACC %in% c(71:75), "ACC"] <- 15
+    
+    
+    contingenceAcc <- table(AccAndAlcool$ACC, AccAndAlcool$ALCOOL)
+    
+    df_contingence <- as.data.frame.matrix(contingenceAcc)
+    colnames(df_contingence) <- c("Oui","Non")
+    
+    plot_graph <- data.frame(type = c(1:15), nb = df_contingence$Oui, Alcool = "Oui")
+    plot_graph2 <- data.frame(type = c(1:15), nb = df_contingence$Non, Alcool  = "Non")
+    final_plot_graph <- rbind(plot_graph, plot_graph2) 
+    
+    if(!is.null(input$typeAccident)){
+      ggplot(data= subset(final_plot_graph, type == input$typeAccident), aes(type, nb)) + 
+      geom_bar(stat= "identity", aes(fill = Alcool)) + 
+      scale_fill_manual(values=c("#004d7e", "#64be29"))
+    }
+  })
+  
+  #1.1 Stupéfiant
+  
+  output$stupefiantPlot <- renderPlot({
+    accidentés <- subset(data, data$ACCIDENT == 1)
+    
+    # Pour savoir si un accident est aggravé on s'interesse au questionnaire approfondi. 
+    # Pour savoir de quel accident il parle, on doit récupérer l'id de l'accident afin de le relier
+    # à l'accident en question.
+    
+    # On sélectionne les bonnes colonnes et on enlève les accidents avec des données vides:
+    AccAndStup <- subset(select(accidentés, "CHOIXACC", "STUP"), !is.na(STUP))
+    
+    # On tris les id par type d'accident:
+    AccAndStup[AccAndStup$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    AccAndStup[AccAndStup$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    AccAndStup[AccAndStup$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    AccAndStup[AccAndStup$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    AccAndStup[AccAndStup$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    AccAndStup[AccAndStup$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    AccAndStup[AccAndStup$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    AccAndStup[AccAndStup$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    AccAndStup[AccAndStup$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    AccAndStup[AccAndStup$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    AccAndStup[AccAndStup$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    AccAndStup[AccAndStup$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    AccAndStup[AccAndStup$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    AccAndStup[AccAndStup$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    AccAndStup[AccAndStup$CHOIXACC %in% c(71:75), "ACC"] <- 15
+    
+    
+    contingenceAcc <- table(AccAndStup$ACC, AccAndStup$STUP)
+    
+    df_contingence <- as.data.frame.matrix(contingenceAcc)
+    colnames(df_contingence) <- c("Oui","Non")
+    
+    plot_graph <- data.frame(type = c(1:15), nb = df_contingence$Oui, Stup = "Oui")
+    plot_graph2 <- data.frame(type = c(1:15), nb = df_contingence$Non, Stup  = "Non")
+    final_plot_graph <- rbind(plot_graph, plot_graph2) 
+    
+    if(!is.null(input$typeAccident)){
+      ggplot(data = subset(final_plot_graph, type == input$typeAccident), aes(type, nb)) + 
+      geom_bar(stat= "identity", aes(fill = Stup)) + 
+      scale_fill_manual(values=c("#004d7e", "#64be29"))
+    }
+    
+  })
+  
   # 1.2 - Les infrastructures
   output$infrastructurePlot <- renderPlot({
     
@@ -239,6 +360,180 @@ shinyServer(function(input, output) {
     }
   })
   
+  # 1.2 Meteo
+  output$meteoPlot <- renderPLot({
+    accidentés <- subset(data, data$ACCIDENT == 1)
+    
+    # Pour savoir si un accident est aggravé on s'interesse au questionnaire approfondi. 
+    # Pour savoir de quel accident il parle, on doit récupérer l'id de l'accident afin de le relier
+    # à l'accident en question.
+    
+    # On sélectionne les bonnes colonnes et on enlève les accidents avec des données vides:
+    AccEtTemps <- subset(select(accidentés, "CHOIXACC", "TEMPS"), !is.na(TEMPS))
+    
+    # On tris les id par type d'accident:
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    AccEtTemps[AccEtTemps$CHOIXACC %in% c(71:75), "ACC"] <- 15
+    
+    
+    contingenceAcc <- table(AccEtTemps$ACC, AccEtTemps$TEMPS)
+    
+    df_contingence <- as.data.frame.matrix(contingenceAcc)
+    colnames(df_contingence) <- c("Sec","Pluie","Intemperies")
+    
+    afc_temps <- CA(df_contingence)
+  })
+  
+  #1.2 Traffic
+  ouput$trafficPlot <- renderPlot({
+    
+    accidentés <- subset(data, data$ACCIDENT == 1)
+    
+    # Pour savoir si un accident est aggravé on s'interesse au questionnaire approfondi. 
+    # Pour savoir de quel accident il parle, on doit récupérer l'id de l'accident afin de le relier
+    # à l'accident en question.
+    
+    
+    # On sélectionne les bonnes colonnes et on enlève les accidents avec des données vides:
+    AccEtTrafic <- subset(select(accidentés, "CHOIXACC", "TRAFIC"), !is.na(TRAFIC))
+    AccEtTrafic <- subset(select(AccEtTrafic, "CHOIXACC", "TRAFIC"), AccEtTrafic$TRAFIC %in% c(1:4))
+    
+    
+    # On tris les id par type d'accident:
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    AccEtTrafic[AccEtTrafic$CHOIXACC %in% c(71:75), "ACC"] <- 15
+    
+    AccEtTrafic$TRAFIC = droplevels(AccEtTrafic$TRAFIC)
+    
+    contingenceAcc <- table(AccEtTrafic$ACC, AccEtTrafic$TRAFIC)
+    
+    df_contingence <- as.data.frame.matrix(contingenceAcc)
+    colnames(df_contingence) <- c("TresFluide","Fluide","Dense", "Bloque")
+    
+    afc_trafic <- CA(df_contingence)
+  })
+  
+  #1.2 Etat de la chaussée
+  output$etatChausseePlot <- renderPlot({
+    accidentés <- subset(data, data$ACCIDENT == 1)
+    
+    # Pour savoir si un accident est aggravé on s'interesse au questionnaire approfondi. 
+    # Pour savoir de quel accident il parle, on doit récupérer l'id de l'accident afin de le relier
+    # à l'accident en question.
+    
+    # On sélectionne les bonnes colonnes et on enlève les accidents avec des données vides:
+    AccAndJournee <- subset(select(accidentés, "CHOIXACC", "CHAUSSEE1", "CHAUSSEE2", "CHAUSSEE3", "CHAUSSEE4"), !is.na(CHAUSSEE1))
+    levels(AccAndJournee$CHAUSSEE1) <- c(1:7)
+    levels(AccAndJournee$CHAUSSEE2) <- c(1:7)
+    levels(AccAndJournee$CHAUSSEE3) <- c(1:7)
+    levels(AccAndJournee$CHAUSSEE4) <- c(1:7)
+    
+    # On tris les id par type d'accident:
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    AccAndJournee[AccAndJournee$CHOIXACC %in% c(71:75), "ACC"] <- 15
+    
+    c1 <- select(subset(AccAndJournee, AccAndJournee$CHAUSSEE1 %in% c(1:7)), "ACC", "CHAUSSEE1")
+    colnames(c1) <- c("typeAcc", "chaussee")
+    c2 <- select(subset(AccAndJournee, AccAndJournee$CHAUSSEE2 %in% c(1:7)), "ACC", "CHAUSSEE2")
+    colnames(c2) <- c("typeAcc", "chaussee")
+    c3 <- select(subset(AccAndJournee, AccAndJournee$CHAUSSEE3 %in% c(1:7)), "ACC", "CHAUSSEE3")
+    colnames(c3) <- c("typeAcc", "chaussee")
+    c4 <- select(subset(AccAndJournee, AccAndJournee$CHAUSSEE4 %in% c(1:7)), "ACC", "CHAUSSEE4")
+    colnames(c4) <- c("typeAcc", "chaussee")
+    
+    c <- rbind(c1,c2)
+    c <- rbind(c,c3)
+    c <- rbind(c,c4)
+    
+    c$chaussee = droplevels(c$chaussee)
+    
+    contingenceAcc <- table(c$typeAcc, c$chaussee)
+    df_contingence <- as.data.frame.matrix(contingenceAcc)
+    colnames(df_contingence) <- c("seche","humide","neige","gravier","boue","huile","deformee")
+    
+    afc_journee <- CA(df_contingence)
+  })
+  
+  #1.2 Type de routes
+  output$typeRoute <- renderPlot({
+    accidentés <- subset(data, data$ACCIDENT == 1)
+    
+    # Pour savoir si un accident est aggravé on s'interesse au questionnaire approfondi. 
+    # Pour savoir de quel accident il parle, on doit récupérer l'id de l'accident afin de le relier
+    # à l'accident en question.
+    
+    
+    # On sélectionne les bonnes colonnes et on enlève les accidents avec des données vides:
+    AccEtRoute <- subset(select(accidentés, "CHOIXACC", "TYPEROUTE"), !is.na(TYPEROUTE))
+    AccEtRoute <- subset(select(AccEtRoute, "CHOIXACC", "TYPEROUTE"), AccEtRoute$TYPEROUTE %in% c(1:6))
+    
+    
+    # On tris les id par type d'accident:
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(1:5), "ACC"] <- 1
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(6:10), "ACC"] <- 2
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(11:15), "ACC"] <- 3
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(16:20), "ACC"] <- 4
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(21:25), "ACC"] <- 5
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(26:30), "ACC"] <- 6
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(31:35), "ACC"] <- 7
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(36:40), "ACC"] <- 8
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(41:45), "ACC"] <- 9
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(46:50), "ACC"] <- 10
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(51:55), "ACC"] <- 11
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(56:60), "ACC"] <- 12
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(61:65), "ACC"] <- 13
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(66:70), "ACC"] <- 14
+    AccEtRoute[AccEtRoute$CHOIXACC %in% c(71:75), "ACC"] <- 15
+    
+    AccEtRoute$TYPEROUTE = droplevels(AccEtRoute$TYPEROUTE)
+    
+    contingenceAcc <- table(AccEtRoute$ACC, AccEtRoute$TYPEROUTE)
+    
+    df_contingence <- as.data.frame.matrix(contingenceAcc)
+    colnames(df_contingence) <- c("Ville","Route","Autoroute", "Peripherique", "TerrainPrive", "Chemin")
+    
+    afc_trafic <- CA(df_contingence)
+  })
+  
   # 1.3
   output$presenceTiersPlot <- renderPlot({
     #On récupère les personnes ayant eu des accidents
@@ -250,12 +545,9 @@ shinyServer(function(input, output) {
     
     # Acc1: id 1 -> 5 , Acc2: id 6 -> 10, etc...
     accidentésAccidentTiers <- select(accidentés, "CHOIXACC", "AUTREUSAGER")
-    str(accidentésAccidentTiers$AUTREUSAGER)
-    
-    
+  
     # On enlève les accidents avec des données vides:
     accidentésTiers <- subset(accidentésAccidentTiers, !is.na(AUTREUSAGER))
-    str(accidentésTiers$AUTREUSAGER)
     
     # On tris les id par type d'accident:
     accidentésTiers[accidentésTiers$CHOIXACC %in% c(1:5), "ACC"]   <- 1
@@ -290,7 +582,61 @@ shinyServer(function(input, output) {
       geom_bar(stat= "identity", aes(fill = Présence_Tiers)) + 
       scale_fill_manual(values=c("#004d7e", "#64be29")) + 
       labs(title="Présence d'un tiers en fonction du type d'accident", x="Type d'accident", y="Nombre de réponse")
-    })
+    }
+  })
+
+  output$aggravationPlot <- renderPlot({
+    
+    #On récupère les personnes ayant eu des accidents
+    accidentés <- subset(data, data$ACCIDENT == 1)
+    
+    # Pour savoir si un accident est aggravé on s'interesse au questionnaire approfondi. 
+    # Pour savoir de quel accident il parle, on doit récupérer l'id de l'accident afin de le relier
+    # à l'accident en question.
+    
+    # Acc1: id 1 -> 5 , Acc2: id 6 -> 10, etc...
+    accidentésIdAccidentTrié <- select(accidentés, "CHOIXACC","AUTREUSAGER", "AGGRAVATION")
+    
+    # On enlève les questionnaires ou la personne n'a pas répondue à aggravation:
+    accidentésIdAccidentTrié <- subset(accidentésIdAccidentTrié, AGGRAVATION != "")
+    accidentésIdAccidentTrié <- subset(accidentésIdAccidentTrié, AGGRAVATION != "0")
+    accidentésIdAccidentTrié <- subset(accidentésIdAccidentTrié, AUTREUSAGER = 1)
+    #On nettoie également les facteurs
+    accidentésIdAccidentTrié$AGGRAVATION = droplevels(accidentésIdAccidentTrié$AGGRAVATION)
+    
+    #Nettoyage:
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(1:5), "ACC"] <- "ACC1"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(6:10), "ACC"] <- "ACC2"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(11:15), "ACC"] <- "ACC3"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(16:20), "ACC"] <- "ACC4"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(21:25), "ACC"] <- "ACC5"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(26:30), "ACC"] <- "ACC6"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(31:35), "ACC"] <- "ACC7"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(36:40), "ACC"] <- "ACC8"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(41:45), "ACC"] <- "ACC9"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(46:50), "ACC"] <- "ACC10"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(51:55), "ACC"] <- "ACC11"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(56:60), "ACC"] <- "ACC12"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(61:65), "ACC"] <- "ACC13"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(66:70), "ACC"] <- "ACC14"
+    accidentésIdAccidentTrié[accidentésIdAccidentTrié$CHOIXACC %in% c(71:75), "ACC"] <- "ACCAUTRE"
+    
+    #On créé les différents niveaux de valeurs
+    levels(accidentésIdAccidentTrié$ACC) <- c("ACC1", "ACC2","ACC3","ACC4","ACC5","ACC6","ACC7","ACC8","ACC9","ACC10","ACC11","ACC12","ACC13","ACC14","ACCAUTRE")
+    
+    
+    # On va récupérer les accidents ou les gens estiment que la réaction d'un tiers à aggravée la situation, etc... :
+    #accidentAggravé <- subset(accidentésIdAccidentTrié, AGGRAVATION == "1")
+    # accidentPasAggravé <- subset(accidentésIdAccidentTrié, AGGRAVATION == "2")
+    # accidentNSPAggravé <- subset(accidentésIdAccidentTrié, AGGRAVATION == "NSP")
+    
+    #Construction des données pour faire l'AFC (tableau de contingences): 
+    afc_raws <- table(accidentésIdAccidentTrié$ACC, accidentésIdAccidentTrié$AGGRAV)
+    
+    # On a deux valriables qualitatives: l'accident et la réponse à aggravation. 
+    # On va donc faire une AFC:
+    res_afc <- CA(afc_raws)
+    
   })
   
   # 2.1
