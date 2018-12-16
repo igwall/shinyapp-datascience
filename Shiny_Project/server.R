@@ -13,18 +13,15 @@ library("dplyr")
 library("ggplot2")
 library("data.table")
 
+data <- read.csv("BDD_ACCIDENTO.csv", sep = ";")
 
+#On récupère les personnes ayant eu des accidents
+accidentés <- subset(data, data$ACCIDENT == 1)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
    
   output$experienceplot <- renderPlot({
-    
-    setwd("~/Documents/Polytech/Semestre7/Data Sciences/Données")
-    data <- read.csv("BDD_ACCIDENTO.csv", sep = ";")
-    
-    #On récupère les personnes ayant eu des accidents
-    accidentés <- subset(data, data$ACCIDENT == 1)
     
     #On retire la personne qui a une expérience peut plosible
     accidentés <- subset(data, data$EXPCYCLO < 98)
@@ -38,7 +35,7 @@ shinyServer(function(input, output) {
 
     # Mise en place des données en deux dimensions pour le plot
     expAndAccCategorie <- data.frame(typeAccident = as.factor(numeric()), experience = numeric())
-    levels(expAndAccCategorie$typeAccident) <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,14 )
+    levels(expAndAccCategorie$typeAccident) <- c(1:14)
     
     for(i in 1:nrow(accidentésNettoyé)) {
       for(j in 1:14){
@@ -54,10 +51,11 @@ shinyServer(function(input, output) {
     
     # draw the histogram with the specified number of bins
     #Plot dynamique pour shiny:
-    ggplot(data = filter(.data = expAndAccCategorie, typeAccident == input$typeAccident), mapping = aes(x=experience, , fill=typeAccident , alpha=0.2)) + 
-    geom_density() + 
-    labs(title="", x="Experience")
-    
+    if(!is.null(input$typeAccident)){
+      ggplot(data = filter(.data = expAndAccCategorie, typeAccident == input$typeAccident), mapping = aes(x=experience, , fill=typeAccident , alpha=0.2)) + 
+      geom_density() + 
+      labs(title="", x="Experience")
+    }
   })
   
 })
