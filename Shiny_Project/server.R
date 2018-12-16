@@ -21,7 +21,7 @@ accidentés <- subset(data, data$ACCIDENT == 1)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
    
-  output$experienceplot <- renderPlot({
+  output$experiencePlot <- renderPlot({
     
     #On retire la personne qui a une expérience peut plosible
     accidentés <- subset(data, data$EXPCYCLO < 98)
@@ -58,23 +58,16 @@ shinyServer(function(input, output) {
     }
   })
   
-  
-  
   # 1.2 - Les infrastructures
   output$infrastructurePlot <- renderPlot({
-    #On récupère les personnes ayant eu des accidents
-    accidentés <- subset(data, data$ACCIDENT == 1)
     
     accidentésInfrastructure <- select(accidentés, "CHOIXACC", "ROLEINFRA")
     
     # On enlève les accidents avec des données vides:
     accidentésInfrastructureApprofondi <- subset(accidentésInfrastructure, !is.na(ROLEINFRA))
-    str(accidentésInfrastructureApprofondi$ROLEINFRA)
-    
+
     levels(accidentésInfrastructureApprofondi$ROLEINFRA) <- c(1,2)
-    levels(accidentésInfrastructureApprofondi$ACC) <- c(1:15)
-    accidentésInfrastructureApprofondi$NIQUE <- 1
-    
+
     # On tris les id par type d'accident:
     accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(1:5), "ACC"] <- 1
     accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(6:10), "ACC"] <- 2
@@ -92,6 +85,8 @@ shinyServer(function(input, output) {
     accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(66:70), "ACC"] <- 14
     accidentésInfrastructureApprofondi[accidentésInfrastructureApprofondi$CHOIXACC %in% c(71:75), "ACC"] <- 15
     
+    levels(accidentésInfrastructureApprofondi$ACC) <- c(1:15)
+    
     contingenceInfrastructure <- table(accidentésInfrastructureApprofondi$ACC, accidentésInfrastructureApprofondi$ROLEINFRA)
     df_contingence <- as.data.frame.matrix(contingenceInfrastructure)
     colnames(df_contingence) <- c("Oui","Non")
@@ -103,7 +98,7 @@ shinyServer(function(input, output) {
     contingence_final <- rbind(contingence_oui, contingence_non) 
     
     if(!is.null(input$typeAccident)){
-    ggplot(data= filter(.data = contingence_final, ACC == input$typeAccident), aes(x=type_acc, y=nb)) + 
+    ggplot(data = subset(contingence_final, type_acc %in% input$typeAccident), aes(x=type_acc, y=nb)) + 
       geom_bar(stat= "identity", aes(fill = RoleInfrastructure)) + 
       scale_fill_manual(values=c("#004d7e", "#64be29")) + 
       labs(title="Role de l'infrastructure pour chaque type d'accident", x="Type d'accident", y="Nombre de réponse")
