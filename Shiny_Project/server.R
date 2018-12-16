@@ -150,10 +150,12 @@ shinyServer(function(input, output) {
     plot_graph2 <- data.frame(type = c(1:15), nb = df_contingence$Non, Présence_Tiers = "Non")
     final_plot_graph <- rbind(plot_graph, plot_graph2) 
     
-    ggplot(data = subset(final_plot_graph, ACC %in% input$typeAccident), aes(type, nb)) + 
-    geom_bar(stat= "identity", aes(fill = Présence_Tiers)) + 
-    scale_fill_manual(values=c("#004d7e", "#64be29")) + 
-    labs(title="Présence d'un tiers en fonction du type d'accident", x="Type d'accident", y="Nombre de réponse")
+    if(!is.null(input$typeAccident)){
+      ggplot(data = subset(final_plot_graph, ACC %in% input$typeAccident), aes(type, nb)) + 
+      geom_bar(stat= "identity", aes(fill = Présence_Tiers)) + 
+      scale_fill_manual(values=c("#004d7e", "#64be29")) + 
+      labs(title="Présence d'un tiers en fonction du type d'accident", x="Type d'accident", y="Nombre de réponse")
+    })
   })
   
   output$representationJeunesPlot <- renderPlot({
@@ -242,13 +244,14 @@ shinyServer(function(input, output) {
       type = c(1:14),
       proportion = finalProportion[,"vingtaine"]
     )
-    
-    ggplot(data= subset(dat, type %in% input$typeAccident), aes(x=type, y=proportion)) +
+    if(!is.null(input$typeAccident)){
+      ggplot(data= subset(dat, type %in% input$typeAccident), aes(x=type, y=proportion)) +
       geom_bar(stat="identity", fill = "#004d7e") + 
       geom_hline(aes(yintercept = finalProportionAllType["vingtaine"]), color="#64be29", linetype="dashed") + 
       theme_light()
-    
-    
+    })
   })
+  
+  
   
 })
