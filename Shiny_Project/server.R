@@ -20,10 +20,10 @@ accidentés <- subset(data, data$ACCIDENT == 1)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
-   
+  
   # 1.1 - Les humeurs
   #Neutre
-  output$humeurNeutrePlot <- renderPLot({
+  output$humeurNeutrePlot <- renderPlot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
                              !is.na(HUMEURGAI) |
@@ -56,7 +56,7 @@ shinyServer(function(input, output) {
     afcNeutre <- CA(contingenceAccNeutre)
   })
   
-  output$humeurGaiPlot <- renderPLot({
+  output$humeurGaiPlot <- renderPlot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
                              !is.na(HUMEURGAI) |
@@ -89,7 +89,7 @@ shinyServer(function(input, output) {
     afcGai <- CA(contingenceAccGai)
   })
   
-  output$humeurTristePlot <- renderPLot({
+  output$humeurTristePlot <- renderPlot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
                              !is.na(HUMEURGAI) |
@@ -122,7 +122,7 @@ shinyServer(function(input, output) {
     afcTriste <- CA(contingenceAccTriste)
   })
   
-  output$humeurContentPlot <- renderPLot({
+  output$humeurContentPlot <- renderPlot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
                              !is.na(HUMEURGAI) |
@@ -155,7 +155,7 @@ shinyServer(function(input, output) {
     afcMecontent <- CA(contingenceAccContent)
   })
   
-  output$humeurColerePlot <- renderPLot({
+  output$humeurColerePlot <- renderPlot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
                              !is.na(HUMEURGAI) |
@@ -246,13 +246,10 @@ shinyServer(function(input, output) {
     
     # Acc1: id 1 -> 5 , Acc2: id 6 -> 10, etc...
     accidentésAccidentTiers <- select(accidentés, "CHOIXACC", "AUTREUSAGER")
-    str(accidentésAccidentTiers$AUTREUSAGER)
-    
     
     # On enlève les accidents avec des données vides:
     accidentésTiers <- subset(accidentésAccidentTiers, !is.na(AUTREUSAGER))
-    str(accidentésTiers$AUTREUSAGER)
-    
+
     # On tris les id par type d'accident:
     accidentésTiers[accidentésTiers$CHOIXACC %in% c(1:5), "ACC"]   <- 1
     accidentésTiers[accidentésTiers$CHOIXACC %in% c(6:10), "ACC"]  <- 2
@@ -273,7 +270,6 @@ shinyServer(function(input, output) {
     # str(accidentésTiers$ACC)
     
     contingenceAcc <- table(accidentésTiers$ACC, accidentésTiers$AUTREUSAGER)
-    plot(contingenceAcc)
     df_contingence <- as.data.frame.matrix(contingenceAcc)
     colnames(df_contingence) <- c("Non","Oui")
     
@@ -282,11 +278,11 @@ shinyServer(function(input, output) {
     final_plot_graph <- rbind(plot_graph, plot_graph2) 
     
     if(!is.null(input$typeAccident)){
-      ggplot(data = subset(final_plot_graph, ACC %in% input$typeAccident), aes(type, nb)) + 
+      ggplot(data = subset(final_plot_graph, type %in% input$typeAccident), aes(type, nb)) + 
       geom_bar(stat= "identity", aes(fill = Présence_Tiers)) + 
       scale_fill_manual(values=c("#004d7e", "#64be29")) + 
       labs(title="Présence d'un tiers en fonction du type d'accident", x="Type d'accident", y="Nombre de réponse")
-    })
+    }
   })
   
   # 2.1
@@ -421,6 +417,4 @@ shinyServer(function(input, output) {
         labs(title="", x="Experience")
     }
   })
-  
-  outpu$
 })
