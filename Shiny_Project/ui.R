@@ -38,42 +38,62 @@ dashboardPage(skin = "blue",
                                                                            "Accident 14" = 14))),
               dashboardBody(
                 tabItems(
-                  
-                  tabItem(tabName = "etat",
-                          fluidRow(
-                            box(title = "Corélation entre sentiment de colère et type d'accident", plotOutput("humeurColerePlot")),
-                            box(title = "Corélation entre sentiment de tristesse et type d'accident", plotOutput("humeurTristePlot"))
-                            
-                          )
-                  ),
-                  
-                  tabItem(tabName = "expe",
-                          fluidRow(
-                            box(title = "Répartition de l'expérience", plotOutput("experiencePlot"))
-                          )
-                  ),
-                  
+                
                   # Second tab content
                   tabItem(tabName = "general",
                           h2("Bienvenue sur Riders Analytics"),
-                          p("Pour visualiser les interprétations des données issues du question de la Mutuelle des Motards")
+                          p("Pour visualiser les interprétations des données issues du question de la Mutuelle des Motards")                  ),
+                  
+                  tabItem(tabName = "etat",
+                          fluidRow(
+                            box(title = "Corélation entre sentiment de colère et type d'accident", plotOutput("humeurColerePlot", height = "600px")),
+                            box(title = "Corélation entre sentiment de tristesse et type d'accident", plotOutput("humeurTristePlot", height = "600px"))
+                          ), 
+                          fluidRow(
+                            box(title = "Représentation de la consommation d'alcool par type d'accident", plotOutput("alcoolPlot")),
+                            box(title = "Représentation de la consommation de stupéfiant par type d'accident", plotOutput("stupefiantPlot"))
+                          )
                   ),
                   
                   tabItem(tabName = "ext",
                           fluidRow(
-                            column(8, h2("Influence des infrastructure") , plotOutput("infrastructurePlot"))
+                            column(8,offset = 2, plotOutput("infrastructurePlot"))
+                          ),
+                          fluidRow(
+                            box(title = "Corélation entre la météo et type d'accident", plotOutput("meteoPlot", height = "600px")),
+                            box(title = "Corélation entre le traffic et type d'accident", plotOutput("trafficPlot", height = "600px"))
+                          ),
+                          fluidRow(
+                            box(title = "Corélation entre etat de la chaussée et type d'accident", plotOutput("etatChausseePlot", height = "600px")),
+                            box(title = "Corélation entre la type de route et le type d'accident", plotOutput("typeRoutePlot", height = "600px"))
                           )
                   ),
                   
                   tabItem(tabName = "tiers",
                           fluidRow(
                             column(8, h2("Présence d'un Tiers"), plotOutput("presenceTiersPlot", height = "500px"))
+                          ), 
+                          fluidRow(
+                            column(8, h2("Aggravation par un tiers"), plotOutput("aggravationPlot"))
                           )
                   ),
                   
                   tabItem(tabName = "age",
                           fluidPage(
                             column(8, h2("Représentation des jeunes"), plotOutput("representationJeunesPlot"))
+                          )
+                  ), 
+                  
+                  
+                  tabItem(tabName = "expe",
+                          fluidRow(
+                            column(12, h2("Répartition de l'expérience"), plotOutput("experiencePlot"))
+                          )
+                  ),
+                  
+                  tabItem(tabName = "usage",
+                          fluidRow(
+                            column(8, h2("Représentation des usages"), plotOutput("usagePlot", height = "500px"))
                           )
                   )
                 )

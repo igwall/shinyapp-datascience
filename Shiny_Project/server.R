@@ -57,7 +57,7 @@ shinyServer(function(input, output) {
   })
   
   #Gai
-  output$humeurGaiPlot <- renderPLot({
+  output$humeurGaiPlot <- renderPlot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
                              !is.na(HUMEURGAI) |
@@ -91,7 +91,7 @@ shinyServer(function(input, output) {
   })
   
   #Triste
-  output$humeurTristePlot <- renderPLot({
+  output$humeurTristePlot <- renderPlot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
                              !is.na(HUMEURGAI) |
@@ -125,7 +125,7 @@ shinyServer(function(input, output) {
   })
   
   #Content
-  output$humeurContentPlot <- renderPLot({
+  output$humeurContentPlot <- renderPlot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
                              !is.na(HUMEURGAI) |
@@ -160,7 +160,7 @@ shinyServer(function(input, output) {
   
   
   #Colere
-  output$humeurColerePlot <- renderPLot({
+  output$humeurColerePlot <- renderPlot({
     AccAndHumeur <- subset(select(accidentés, "CHOIXACC", "HUMEURNEUTRE",	"HUMEURGAI",	"HUMEURMECONTENT",	"HUMEURTRISTE",	"HUMEURCOLERE"),
                            !is.na(HUMEURNEUTRE) |
                              !is.na(HUMEURGAI) |
@@ -216,7 +216,7 @@ shinyServer(function(input, output) {
     }
     
     tab <- table(AccAndUsage$typeAccident, AccAndUsage$usage)
-    chisq.test(tab)
+    colnames(tab) <- c("Loisir","DomicileTravail", "Pro")
     AFCusage <- CA(tab)
     
   })
@@ -261,7 +261,7 @@ shinyServer(function(input, output) {
     final_plot_graph <- rbind(plot_graph, plot_graph2) 
     
     if(!is.null(input$typeAccident)){
-      ggplot(data= subset(final_plot_graph, type == input$typeAccident), aes(type, nb)) + 
+      ggplot(data= subset(final_plot_graph, type %in% input$typeAccident), aes(type, nb)) + 
       geom_bar(stat= "identity", aes(fill = Alcool)) + 
       scale_fill_manual(values=c("#004d7e", "#64be29"))
     }
@@ -306,8 +306,9 @@ shinyServer(function(input, output) {
     plot_graph2 <- data.frame(type = c(1:15), nb = df_contingence$Non, Stup  = "Non")
     final_plot_graph <- rbind(plot_graph, plot_graph2) 
     
+    print(subset(final_plot_graph, type %in% input$typeAccident))
     if(!is.null(input$typeAccident)){
-      ggplot(data = subset(final_plot_graph, type == input$typeAccident), aes(type, nb)) + 
+      ggplot(data = subset(final_plot_graph, type %in% input$typeAccident), aes(type, nb)) + 
       geom_bar(stat= "identity", aes(fill = Stup)) + 
       scale_fill_manual(values=c("#004d7e", "#64be29"))
     }
@@ -362,7 +363,7 @@ shinyServer(function(input, output) {
   })
   
   # 1.2 Meteo
-  output$meteoPlot <- renderPLot({
+  output$meteoPlot <- renderPlot({
     accidentés <- subset(data, data$ACCIDENT == 1)
     
     # Pour savoir si un accident est aggravé on s'interesse au questionnaire approfondi. 
@@ -399,7 +400,7 @@ shinyServer(function(input, output) {
   })
   
   #1.2 Traffic
-  ouput$trafficPlot <- renderPlot({
+  output$trafficPlot <- renderPlot({
     
     accidentés <- subset(data, data$ACCIDENT == 1)
     
@@ -450,10 +451,10 @@ shinyServer(function(input, output) {
     
     # On sélectionne les bonnes colonnes et on enlève les accidents avec des données vides:
     AccAndJournee <- subset(select(accidentés, "CHOIXACC", "CHAUSSEE1", "CHAUSSEE2", "CHAUSSEE3", "CHAUSSEE4"), !is.na(CHAUSSEE1))
-    levels(AccAndJournee$CHAUSSEE1) <- c(1:7)
-    levels(AccAndJournee$CHAUSSEE2) <- c(1:7)
-    levels(AccAndJournee$CHAUSSEE3) <- c(1:7)
-    levels(AccAndJournee$CHAUSSEE4) <- c(1:7)
+
+    AccAndJournee$CHAUSSEE1 = droplevels(AccAndJournee$CHAUSSEE1)
+    AccAndJournee$CHAUSSEE2 = droplevels(AccAndJournee$CHAUSSEE2)
+    AccAndJournee$CHAUSSEE3 = droplevels(AccAndJournee$CHAUSSEE3)
     
     # On tris les id par type d'accident:
     AccAndJournee[AccAndJournee$CHOIXACC %in% c(1:5), "ACC"] <- 1
@@ -495,7 +496,7 @@ shinyServer(function(input, output) {
   })
   
   #1.2 Type de routes
-  output$typeRoute <- renderPlot({
+  output$typeRoutePlot <- renderPlot({
     accidentés <- subset(data, data$ACCIDENT == 1)
     
     # Pour savoir si un accident est aggravé on s'interesse au questionnaire approfondi. 
@@ -530,7 +531,7 @@ shinyServer(function(input, output) {
     contingenceAcc <- table(AccEtRoute$ACC, AccEtRoute$TYPEROUTE)
     
     df_contingence <- as.data.frame.matrix(contingenceAcc)
-    colnames(df_contingence) <- c("Ville","Route","Autoroute", "Peripherique", "TerrainPrive", "Chemin")
+    colnames(df_contingence) <- c("Ville","Route","Autoroute", "Peripherique", "Chemin")
     
     afc_trafic <- CA(df_contingence)
   })
@@ -566,8 +567,6 @@ shinyServer(function(input, output) {
     accidentésTiers[accidentésTiers$CHOIXACC %in% c(61:65), "ACC"] <- 13
     accidentésTiers[accidentésTiers$CHOIXACC %in% c(66:70), "ACC"] <- 14
     accidentésTiers[accidentésTiers$CHOIXACC %in% c(71:75), "ACC"] <- 15
-    
-    # str(accidentésTiers$ACC)
     
     contingenceAcc <- table(accidentésTiers$ACC, accidentésTiers$AUTREUSAGER)
     df_contingence <- as.data.frame.matrix(contingenceAcc)
@@ -766,7 +765,7 @@ shinyServer(function(input, output) {
     # draw the histogram with the specified number of bins
     #Plot dynamique pour shiny:
     if(!is.null(input$typeAccident)){
-      ggplot(data = filter(.data = expAndAccCategorie, typeAccident == input$typeAccident), mapping = aes(x=experience, , fill=typeAccident , alpha=0.2)) + 
+      ggplot(data = subset(expAndAccCategorie, typeAccident %in% input$typeAccident), mapping = aes(x=experience, , fill=typeAccident , alpha=0.2)) + 
         geom_density() + 
         labs(title="", x="Experience")
     }
