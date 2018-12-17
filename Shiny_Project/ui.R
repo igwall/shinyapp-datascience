@@ -13,7 +13,6 @@ library(shinydashboard)
 dashboardPage(skin = "blue",
               dashboardHeader(title = "Riders Analytics"),
               dashboardSidebar(
-                id = "tabs", 
                 menuItem("Général", tabName = "general", icon = icon("arrow-right")),
                 menuItem("Sections", tabName = "sections", icon = icon("arrow-right"),
                          menuSubItem("Etat du conducteur", tabName = "etat", icon = icon("arrow-right")),
@@ -39,7 +38,15 @@ dashboardPage(skin = "blue",
                                                                            "Accident 14" = 14))),
               dashboardBody(
                 tabItems(
-                  # First tab content
+                  
+                  tabItem(tabName = "etat",
+                          fluidRow(
+                            box(title = "Corélation entre sentiment de colère et type d'accident", plotOutput("humeurColerePlot")),
+                            box(title = "Corélation entre sentiment de tristesse et type d'accident", plotOutput("humeurTristePlot"))
+                            
+                          )
+                  ),
+                  
                   tabItem(tabName = "expe",
                           fluidRow(
                             box(title = "Répartition de l'expérience", plotOutput("experiencePlot"))
@@ -48,12 +55,25 @@ dashboardPage(skin = "blue",
                   
                   # Second tab content
                   tabItem(tabName = "general",
-                          h2("Bienvenue chez nous")
+                          h2("Bienvenue sur Riders Analytics"),
+                          p("Pour visualiser les interprétations des données issues du question de la Mutuelle des Motards")
                   ),
                   
                   tabItem(tabName = "ext",
                           fluidRow(
-                            box(title = "Influence des infrastructure", plotOutput("infrastructurePlot"))
+                            column(8, h2("Influence des infrastructure") , plotOutput("infrastructurePlot"))
+                          )
+                  ),
+                  
+                  tabItem(tabName = "tiers",
+                          fluidRow(
+                            column(8, h2("Présence d'un Tiers"), plotOutput("presenceTiersPlot", height = "500px"))
+                          )
+                  ),
+                  
+                  tabItem(tabName = "age",
+                          fluidPage(
+                            column(8, h2("Représentation des jeunes"), plotOutput("representationJeunesPlot"))
                           )
                   )
                 )
